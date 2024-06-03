@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 void main() {
-  runApp(const MyApp());
+  runApp(MaterialApp(home: Scaffold(body: Center(child: WaterInputWidget()))));
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -123,3 +125,116 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+class WaterCupPainter extends CustomPainter {
+  final double waterLevel;  // 水位比例，0.0 至 1.0
+  final double animationValue;  // 动画值，用于控制波的水平偏移
+
+  WaterCupPainter({required this.waterLevel, required this.animationValue});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    double baseHeight = size.height * (1 - waterLevel); // 计算水的基本高度
+    var paint = Paint()..style = PaintingStyle.fill;
+
+    // 绘制多层波浪
+    _drawWave(canvas, size, baseHeight, animationValue, 20.0, Colors.blue[300]!, 150.0, 1.0);
+    _drawWave(canvas, size, baseHeight, animationValue, 15.0, Colors.blue[200]!, 120.0, 2.0);
+    _drawWave(canvas, size, baseHeight, animationValue, 20.0, Colors.blue[100]!, 120.0, 1.0);
+
+    // 绘制杯子
+    paint.color = Colors.black;
+    paint.style = PaintingStyle.stroke;
+    paint.strokeWidth = 2;
+    var cupPath = Path();
+    cupPath.moveTo(0, 0);
+    cupPath.lineTo(0, size.height);
+    cupPath.lineTo(size.width, size.height);
+    cupPath.lineTo(size.width, 0);
+    cupPath.close();
+    canvas.drawPath(cupPath, paint);
+  }
+
+  void _drawWave(Canvas canvas, Size size, double baseHeight, double normalizedAnimationValue, double amplitude, Color color, double wavelength, double speed) {
+    var wavePaint = Paint()..color = color;
+
+    var wavePath = Path();
+    double phase = (normalizedAnimationValue * speed) % (2 * math.pi); // 保持相位在0到2π之间
+
+    wavePath.moveTo(0, baseHeight);
+    for (double i = 0; i <= size.width; i++) {
+      double y = amplitude * math.sin((i / wavelength) * 2 * math.pi + phase);
+      // 确保波浪位置在杯子内部
+      double waveY = baseHeight - y;
+      waveY = math.min(math.max(waveY, amplitude), size.height - amplitude); // 限制波浪在杯子内部
+      wavePath.lineTo(i, waveY);
+    }
+    wavePath.lineTo(size.width, size.height);
+    wavePath.lineTo(0, size.height);
+    wavePath.close();
+    canvas.drawPath(wavePath, wavePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;  // 确保动画更新时重绘
+  }
+}
+
+class WaterInputWidget extends StatefulWidget {
+  @override
+  _WaterInputWidgetState createState() => _WaterInputWidgetState();
+}
+
+class _WaterInputWidgetState extends State<WaterInputWidget> with SingleTickerProviderStateMixin {
+  double _waterLevel = 0.0;
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return CustomPaint(
+              size: Size(200, 400),
+              painter: WaterCupPainter(
+                waterLevel: _waterLevel,
+                animationValue: _controller.value * 2 * math.pi,  // 让动画循环
+              ),
+            );
+          },
+        ),
+        Slider(
+          value: _waterLevel,
+          min: 0.0,
+          max: 1.0,
+          divisions: 100,
+          label: "${(_waterLevel * 100).toStringAsFixed(0)}%",
+          onChanged: (value) {
+            setState(() {
+              _waterLevel = value;
+            });
+          },
+        ),
+      ],
+    );
+  }
+}
+
