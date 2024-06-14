@@ -1,51 +1,86 @@
 #include <WiFi.h>
+#include <FirebaseESP32.h>
+#include "secret.h"
+#include <NTPClient.h>
+#include <WiFiUdp.h>
 #include <HardwareSerial.h>
-#include <secret.h>
+#include <time.h>
 
-const char* ssid = SECRET_SSID;
-const char* password = SECRET_PASS;
+// 初始化WiFiUDP实例
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);
 
+FirebaseData firebaseData;
 HardwareSerial mySerial(1); // 使用第二个硬件串口
+FirebaseConfig firebaseConfig;
+FirebaseAuth firebaseAuth;
+
+// NTP服务器更新时间
+const long utcOffsetInSeconds = 3600; // 例如，对于UTC+1时区
 
 void setup() {
-  Serial.begin(115200);  // 启动串口通信
-  mySerial.begin(9600, SERIAL_8N1, 17, 16); // 开始第二串口通信，波特率9600, 8数据位，无奇偶校验位，1停止位，RX引脚17，TX引脚16
-  WiFi.begin(ssid, password);  // 开始连接WiFi
+    Serial.begin(115200);
+    mySerial.begin(9600, SERIAL_8N1, 17, 16);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
-  while (WiFi.status() != WL_CONNECTED) {  // 检查WiFi连接状态
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.println("WiFi connected.");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());  // 打印分配到的IP地址
-  Serial.println("UART communication started. Waiting for data...");
+    Serial.print("Connecting to Wi-Fi");
+    while (WiFi.status() != WL_CONNECTED) {
+        Serial.print(".");
+        delay(300);
+    }
+    Serial.println();
+    Serial.print("Connected with IP: ");
+    Serial.println(WiFi.localIP());
+
+    timeClient.begin();
+    timeClient.setTimeOffset(utcOffsetInSeconds);
+
+    configTime(utcOffsetInSeconds, 0, "pool.ntp.org", "time.nist.gov");
+
+    firebaseConfig.host = DATABASE_URL;
+    firebaseConfig.api_key = FIREBASE_API_KEY;
+    firebaseAuth.user.email = FIREBASE_USER_EMAIL;
+    firebaseAuth.user.password = FIREBASE_USER_PASSWORD;
+
+    Firebase.begin(&firebaseConfig, &firebaseAuth);
+    Firebase.reconnectWiFi(true);
+}
+
+String getFormattedDateTime() {
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        Serial.println("Failed to obtain time");
+        return "";
+    }
+    char timeStringBuff[50]; //50 chars should be enough
+    strftime(timeStringBuff, sizeof(timeStringBuff), "%Y-%m-%d %H:%M:%S", &timeinfo);
+    return String(timeStringBuff);
 }
 
 void loop() {
-  if (mySerial.available() >= 4) {  // 确保缓冲区至少有4个字节（完整的数据帧）
-    uint8_t header = mySerial.read();
-    if (header == 0xFF) {  // 确认帧头
-      uint8_t highByte = mySerial.read();
-      uint8_t lowByte = mySerial.read();
-      uint8_t checksum = mySerial.read();  // 读取校验和
+    timeClient.update();
 
-      uint16_t level = (highByte << 8) + lowByte;  // 计算液位高度
-      Serial.print("Liquid level: ");
-      Serial.print(level);
-      Serial.println(" mm");
+    if (mySerial.available() >= 4) {
+        uint8_t header = mySerial.read();
+        if (header == 0xFF) {
+            uint8_t highByte = mySerial.read();
+            uint8_t lowByte = mySerial.read();
+            uint8_t checksum = mySerial.read();
+            uint16_t level = (highByte << 8) + lowByte;
 
-      // 校验和验证（可选）
-      uint8_t calculatedChecksum = (header + highByte + lowByte) & 0xFF;
-      if (calculatedChecksum == checksum) {
-        Serial.println("Checksum OK");
-      } else {
-        Serial.println("Checksum Error");
-      }
-    } else {
-      Serial.println("Frame header mismatch or corrupted data.");
+            FirebaseJson json;
+            json.set("timestamp", getFormattedDateTime());
+            json.set("device", "ESP32");
+            json.set("level", level);
+
+            Serial.print("Pushing JSON data... ");
+            if (Firebase.pushJSON(firebaseData, "/sensorData", json)) {
+                Serial.println("Data pushed successfully");
+            } else {
+                Serial.print("Failed to push data: ");
+                Serial.println(firebaseData.errorReason());
+            }
+        }
     }
-  }
-  delay(100);  // 稍微延迟以等待更多数据
+    delay(100);
 }
