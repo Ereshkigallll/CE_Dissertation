@@ -84,7 +84,7 @@ flutter:
   fonts:
     - family: Chillax
       fonts:
-        - asset: assets/fonts/Chillax-bold.otf
+        - asset: assets/fonts/Chillax-Bold.otf
           weight: 700
         - asset: assets/fonts/Chillax-Extralight.otf
           weight: 200
