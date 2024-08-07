@@ -2,6 +2,15 @@
 
 [![Static Badge](https://img.shields.io/badge/English_Readme-477CB3)](https://github.com/Ereshkigallll/CE_Dissertation/tree/main)
 
+![Static Badge](https://img.shields.io/badge/Python-F1F4F1?logo=python&logoColor=%231C84DD)
+![Static Badge](https://img.shields.io/badge/C%2B%2B-F1F4F1?logo=cplusplus&logoColor=%231C84DD)
+![Static Badge](https://img.shields.io/badge/Flutter-F1F4F1?logo=flutter&logoColor=%2302569B)
+![Static Badge](https://img.shields.io/badge/Pytorch-F1F4F1?logo=pytorch&logoColor=%23EE4C2C)
+![Static Badge](https://img.shields.io/badge/Raspberry_Pi-F1F4F1?logo=raspberrypi&logoColor=%23A22846)
+![Static Badge](https://img.shields.io/badge/Espressif-F1F4F1?logo=espressif&logoColor=%23E7352C)
+![Static Badge](https://img.shields.io/badge/Dart-F1F4F1?logo=dart&logoColor=%230175C2)
+
+
 ## 1. Introduction
 
 HydroTrack是一个基于智能物联网追踪用户水分摄入同时通过深度学习模型来分类饮料类型的饮水量追踪系统。整个系统由三个部分组成，安装在杯子底部的Attachment，用于展示饮水量信息、饮料分类以及为Attachment充电的Docking Station以及一个可以手动上传数据的移动应用。通过这三个部分的有机结合，可以帮助用户形成良好的水分摄入的习惯。
