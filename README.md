@@ -5,27 +5,26 @@
 
 ## 1. Introduction
 
-HydroTrack是一个基于智能物联网追踪用户水分摄入同时通过深度学习模型来分类饮料类型的饮水量追踪系统。整个系统由三个部分组成，安装在杯子底部的Attachment，用于展示饮水量信息、饮料分类以及为Attachment充电的Docking Station以及一个可以手动上传数据的移动应用。通过这三个部分的有机结合，可以帮助用户形成良好的水分摄入的习惯。
+HydroTrack is an advanced hydration tracking system that utilises smart IoT technology to monitor water intake and employs deep learning models to classify beverage types. The system comprises three components: an Attachment installed at the base of the cup, a Docking Station that displays hydration data, classifies beverages, and charges the Attachment, and a mobile application for manually uploading data. Together, these elements synergistically help users develop healthy hydration habits.
 
 ## 2. Pre-request
 
 ### 2.1 General Request
 
-- 3D打印机以及耗材
-- 电烙铁
-- 导线
-- 激光切割
+- 3D Printer and filament
+- Soldering iron
+- Laser Cutting
 
 ### 2.2 Attachment
-- 820 mA 锂电池
-- DFRobot ESP32-C6迷你开发板 [产品wiki](https://wiki.dfrobot.com/SKU_DFR1117_Beetle_ESP32_C6)
-- 磁吸充电触点一对
-- 电应普非接触式超声波液位传感器
+- 820 mA lithium polymer battery
+- DFRobot ESP32-C6 mini development board [Product wiki](https://wiki.dfrobot.com/SKU_DFR1117_Beetle_ESP32_C6)
+- Magnetic Charging Contactor 
+- Non-contact ultrasonic liquid level sensor
 
 ### 2.3 Docking Station
-- 树莓派4B
+- Raspberry Pi 4B
 - DHT22
-- 微雪 5.65寸 7色电子墨水屏
-- DFRobot 红外光声二氧化碳传感器
-- 树莓派摄像头
-- WS2812 环状LED灯板
+- WaveShare 5.65-inches 7 color e-ink screen
+- DFRobot infrared CO2 sensor [Product wiki](https://wiki.dfrobot.com/SKU_SEN0536_Gravity_SCD41_Infrared_CO2_Sensor)
+- Raspberry Pi camera module
+- WS2812 ring LED board
