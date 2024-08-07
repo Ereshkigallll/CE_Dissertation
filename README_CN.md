@@ -57,5 +57,11 @@ HydroTrack是一个基于智能物联网追踪用户水分摄入同时通过深�
 #define FIREBASE_USER_PASSWORD "Your Firebase User Password"
 ```
 
-其中，Firebase的数据库 URL 可以在数据库的主界面找到：
+其中，Firebase的数据库 `URL` 可以在数据库的主界面找到：
 ![image](./3_images/firebase_0.png)
+
+Firebase的 `API Key` 可以在项目的设置中找到：
+![image](./3_images/firebase_1.png)
+
+用户邮箱和密码可以在项目设置中的 Users and Permissions 中自己设置：
+![image](./3_images/firebase_2.png)
