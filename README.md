@@ -1,6 +1,6 @@
 # :cup_with_straw: HydroTrack
 
-[![Static Badge](https://img.shields.io/badge/Chinese_Readme-477CB3)](https://github.com/Ereshkigallll/CE_Dissertation/blob/main/README_CN.mds)
+[![Static Badge](https://img.shields.io/badge/Chinese_Readme-477CB3)](https://github.com/Ereshkigallll/CE_Dissertation/blob/main/README_CN.md)
 
 
 ## 1. Introduction
